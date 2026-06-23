@@ -5,6 +5,9 @@ on:
   #     - cron: 0 */6 * * * # 每6小时执行一次
   workflow_dispatch: # 允许手动触发
 
+permissions:
+  contents: write
+
 jobs:
   auto_renew_icehost:
     runs-on: ubuntu-22.04
@@ -14,6 +17,12 @@ jobs:
         with:
           repository: ${{ github.repository_owner }}/Icehost-Renew-Private
           token: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          path: private_repo
+          
+      - name: Checkout public repository
+        uses: actions/checkout@v6
+        with:
+          path: public_repo
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -354,13 +363,15 @@ jobs:
           PROXY_SOCKS5: ${{ env.PROXY_SOCKS5 }}
           HEADLESS: "false"
         run: |
+          cd private_repo
           xvfb-run --auto-servernum python icehost-renew.py
 
-      - name: Update Public README and Push
+      - name: Update Public README with EOF
         run: |
           CURRENT_TIME=$(TZ="Asia/Shanghai" date +"%Y-%m-%d %H:%M:%S")
+          echo "Current time is: $CURRENT_TIME"
           
-          cat << EOF > README.md
+          cat << EOF > public_repo/README.md
           # Auto Renew Icehost
           
           Icehost 自动续期运行监控。
@@ -369,11 +380,13 @@ jobs:
           - **上次自动续期时间**：$CURRENT_TIME (北京时间)
           - **运行状态**：工作流执行成功 🟢
           EOF
-          
-          # 配置 Git 并强制推送
+
+      - name: Commit and Push to Public Repo
+        run: |
+          cd public_repo
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"          
-          git remote set-url origin "https://github.com/${{ github.repository }}.git"
+          git config --local user.name "github-actions[bot]"
           git add README.md
-          git commit -m "docs: update execution time in README [skip ci]"
-          git push origin HEAD:main --force
+          # 只有在 README 真正有变化时才提交，防止无意义报错
+          git diff --quiet && git diff --staged --quiet || git commit -m "docs: update execution time in README [skip ci]"
+          git push origin HEAD:${{ github.ref_name }}
