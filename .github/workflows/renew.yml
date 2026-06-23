@@ -358,10 +358,16 @@ jobs:
 
       - name: Update README with execution time
         run: |
-          CURRENT_TIME=$(TZ="Asia/Shanghai" date +"%Y-%m-%d %H:%M:%S")
-          echo "Current time is: $CURRENT_TIME"
-          sed -i '//,//{//!{//!d;};}' README.md
-          sed -i '//a 上次自动续期时间：'"$CURRENT_TIME"' (北京时间)' README.md
+          CURRENT_TIME=$(TZ="Asia/Shanghai" date +"%Y-%m-%d %H:%M:%S")          
+          cat << EOF > README.md
+          # Icehost 自动续期监控
+          
+          本项目用于自动续期 Icehost 的服务。
+          
+          ---
+          - **上次自动续期时间**：$CURRENT_TIME (北京时间)
+          - **运行状态**：正常运行中
+          EOF
 
       - name: Commit and Push changes
         run: |
