@@ -359,9 +359,9 @@ jobs:
       - name: Update README with execution time
         run: |
           CURRENT_TIME=$(TZ="Asia/Shanghai" date +"%Y-%m-%d %H:%M:%S")
-          echo "Current time is: $CURRENT_TIME"        
-          sed -i "//,//{//!d;}" README.md
-          sed -i "//a 上次自动续期时间：$CURRENT_TIME (北京时间)" README.md
+          echo "Current time is: $CURRENT_TIME"
+          sed -i '//,//{//!{//!d;};}' README.md
+          sed -i '//a 上次自动续期时间：'"$CURRENT_TIME"' (北京时间)' README.md
 
       - name: Commit and Push changes
         run: |
