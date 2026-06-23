@@ -356,24 +356,24 @@ jobs:
         run: |
           xvfb-run --auto-servernum python icehost-renew.py
 
-      - name: Update README with execution time
+      - name: Update Public README and Push
         run: |
-          CURRENT_TIME=$(TZ="Asia/Shanghai" date +"%Y-%m-%d %H:%M:%S")          
-          cat << EOF > README.md
-          # Icehost 自动续期监控
+          CURRENT_TIME=$(TZ="Asia/Shanghai" date +"%Y-%m-%d %H:%M:%S")
           
-          本项目用于自动续期 Icehost 的服务。
+          cat << EOF > README.md
+          # Auto Renew Icehost
+          
+          Icehost 自动续期运行监控。
           
           ---
           - **上次自动续期时间**：$CURRENT_TIME (北京时间)
-          - **运行状态**：正常运行中
+          - **运行状态**：工作流执行成功 🟢
           EOF
-
-      - name: Commit and Push changes
-        run: |
+          
+          # 配置 Git 并强制推送
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
+          git config --local user.name "github-actions[bot]"          
+          git remote set-url origin "https://github.com/${{ github.repository }}.git"
           git add README.md
-          # 只有在 README 有变动时才提交，防止没有变化时报错
-          git diff --quiet && git diff --staged --quiet || git commit -m "docs: update execution time in README [skip ci]"
-          git push
+          git commit -m "docs: update execution time in README [skip ci]"
+          git push origin HEAD:main --force
