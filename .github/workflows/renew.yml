@@ -11,6 +11,7 @@ permissions:
 jobs:
   auto_renew_icehost:
     runs-on: ubuntu-22.04
+    timeout-minutes: 15
     steps:
       - name: Checkout private repository
         uses: actions/checkout@v6
