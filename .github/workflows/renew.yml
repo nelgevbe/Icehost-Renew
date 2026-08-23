@@ -5,16 +5,14 @@ on:
   #     - cron: 0 */6 * * * # 每6小时执行一次
   workflow_dispatch: # 允许手动触发
 
-permissions:
-  contents: write
-
 jobs:
   auto_renew_icehost:
     runs-on: ubuntu-22.04
     permissions:
       actions: write
-      contents: read
+      contents: write
     timeout-minutes: 15
+
     steps:
       - name: Checkout private repository
         uses: actions/checkout@v6
