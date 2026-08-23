@@ -11,6 +11,9 @@ permissions:
 jobs:
   auto_renew_icehost:
     runs-on: ubuntu-22.04
+    permissions:
+      actions: write
+      contents: read
     timeout-minutes: 15
     steps:
       - name: Checkout private repository
@@ -391,3 +394,13 @@ jobs:
           # 只有在 README 真正有变化时才提交，防止无意义报错
           git diff --quiet && git diff --staged --quiet || git commit -m "docs: update execution time in README [skip ci]"
           git push origin HEAD:${{ github.ref_name }}
+
+      - name: 清理历史运行记录
+        if: always()
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          delete_workflow_pattern: ${{ github.workflow }}
+          retain_days: 0
+          keep_minimum_runs: 2
