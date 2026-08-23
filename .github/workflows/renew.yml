@@ -32,7 +32,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install seleniumbase requests
+          pip install seleniumbase requests tzdata
           sudo apt-get update
           sudo apt-get install -y xvfb unzip
 
